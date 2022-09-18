@@ -13,8 +13,11 @@ jobs:
          - run:
             name: Setup eviroment
             command: |
-               cd nginx-hello
-               make setup
+               python3 -m venv venv
+               . venv/bin/activate
+               # Install hadolint
+               wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+               chmod +x /bin/hadolint
          - run:
             name: Install dependence
             command: |
@@ -25,6 +28,9 @@ jobs:
             command: |
                cd nginx-hello
                docker build -t thanhbao0390/nginx-hello:1.0 .
+         - save_cache:
+            paths: [capstone]
+            key: nginx-hello-build
    
    
 
