@@ -4,9 +4,8 @@ all: setup install lint
 
 setup:
 	# Create python virtualenv & source it
-	# source ~/.devops/bin/activate
-	python3 -m venv ~/.devops
-	source ~/.devops/bin/activate
+	python3 -m venv venv
+    . venv/bin/activate
 
 install:
 	# This should be run from inside a virtualenv
