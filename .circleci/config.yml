@@ -5,48 +5,31 @@ orbs:
   slack: circleci/slack@4.10.1
 
 jobs:
-   install:
-      docker:
-         - image: circleci/node:13.8.0
-      steps:
-         - checkout
-         - run: |
-            cd nginx-hello
-            make install
    build:
       docker:
          - image: circleci/node:13.8.0
       steps:
          - checkout
-         - run: |
-            cd nginx-hello
-            make build
-   push:
-      docker:
-         - image: circleci/node:13.8.0
-      steps:
-         - checkout
-         - run: |
-            cd nginx-hello
-            make push
-   test:
-      docker:
-         - image: circleci/node:13.8.0
-      steps:
-         - checkout
-         - run: |
-            cd nginx-hello
-            make test
+         - run:
+            name: Setup eviroment
+            command: |
+               cd nginx-hello
+               make setup
+         - run:
+            name: Install dependence
+            command: |
+               cd nginx-hello
+               make install
+         - run:
+            name: Building image
+            command: |
+               cd nginx-hello
+               docker build -t thanhbao0390/nginx-hello:1.0 .
+   
    
 
 workflows:
   capstone:
     jobs:
-      - install
-      - build:
-            requires: [install]
-      - push:
-            requires: [build]
-      - test:
-            requires: [push]
+      - build
       

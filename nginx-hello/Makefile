@@ -1,19 +1,27 @@
-VERSION=1.0
-PREFIX=thanhbao0390/nginx-hello
-TAG=$(VERSION)
 
-all: build push
+all: setup install lint
+
+
+setup:
+	# Create python virtualenv & source it
+	# source ~/.devops/bin/activate
+	python3 -m venv ~/.devops
+	source ~/.devops/bin/activate
 
 install:
-	@echo "Install dependencies:"
-	curl -fsSL https://get.docker.com/ | sh
-	docker run hello-world
-build:
-	@echo "Building image:"
-	docker build -t $(PREFIX):$(TAG) .
-push:
-	@echo "Pushing image:"
-	docker push $(PREFIX):$(TAG)
-test:
-	@echo "Running container:"
-	docker run --rm -p 8080:8080 $(PREFIX):$(TAG)
+	# This should be run from inside a virtualenv
+	pip install --upgrade pip &&\
+		pip install -r requirements.txt &&\
+		wget -O ./hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+		chmod +x ./hadolint
+
+lint:
+	# See local hadolint install instructions:   https://github.com/hadolint/hadolint
+	# This is linter for Dockerfiles
+	hadolint Dockerfile
+	# This is a linter for Python source code linter: https://www.pylint.org/
+	# This should be run from inside a virtualenv
+	pylint --disable=R,C,W1203,W1202 app.py
+
+
+
