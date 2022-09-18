@@ -4,6 +4,10 @@ TAG=$(VERSION)
 
 all: build push
 
+install:
+	@echo "Install dependencies:"
+	curl -fsSL https://get.docker.com/ | sh
+	docker run hello-world
 build:
 	@echo "Building image:"
 	docker build -t $(PREFIX):$(TAG) .

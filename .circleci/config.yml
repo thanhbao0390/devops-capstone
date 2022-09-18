@@ -5,9 +5,17 @@ orbs:
   slack: circleci/slack@4.10.1
 
 jobs:
+   install:
+      docker:
+         - image: circleci/node:13.8.0
+      steps:
+         - checkout
+         - run: |
+            cd nginx-hello
+            make install
    build:
       docker:
-         - image: python:3.7.3-stretch
+         - image: circleci/node:13.8.0
       steps:
          - checkout
          - run: |
@@ -15,7 +23,7 @@ jobs:
             make build
    push:
       docker:
-         - image: python:3.7.3-stretch
+         - image: circleci/node:13.8.0
       steps:
          - checkout
          - run: |
@@ -23,7 +31,7 @@ jobs:
             make push
    test:
       docker:
-         - image: python:3.7.3-stretch
+         - image: circleci/node:13.8.0
       steps:
          - checkout
          - run: |
@@ -34,7 +42,9 @@ jobs:
 workflows:
   capstone:
     jobs:
-      - build
+      - install
+      - build:
+            requires: [install]
       - push:
             requires: [build]
       - test:
