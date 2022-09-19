@@ -8,17 +8,30 @@ jobs:
    install:
       docker:
          - image: circleci/python:3.7.3-stretch
+      working_directory: ~/repo
       steps:
          - checkout
          - run:
             name: Install dependencies and Lint app
             command: |
-               sudo apt-get update
-               sudo apt-get install python3-venv
                python3 -m venv venv
                . venv/bin/activate
+               cd nginx-hello
                make install
-               make lint
+               # Install hadolint
+               wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+               chmod +x /bin/hadolint
+         
+         # run lint!
+         - run:
+            name: run lint
+            command: |
+               . venv/bin/activate
+               make lint 
+         - save_cache:
+            paths:
+               - ./venv
+
    build:
       docker:
          - image: circleci/python:3.7.3-stretch
