@@ -2,24 +2,23 @@
 version: 2.1
 
 orbs: 
-  slack: circleci/slack@4.10.1
+   slack: circleci/slack@4.10.1
 
 jobs:
    build:
       docker:
-         - image: cimg/base:2021.04
+         - image: circleci/python:3.7.3-stretch
+      working_directory: ~/
       steps:
          - checkout
          - run:
-            name: Build docker
+            name: Build and push to docker hub
             command: |
-               cd nginx-hello
-               make build
-         - run:
-            name: Push docker
-            command: |
-               cd nginx-hello
-               make build
+               docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}
+               docker build -t ${DOCKERHUB_USERNAME}/nginx-hello:latest .
+               docker push ${DOCKERHUB_USERNAME}/nginx-hello:latest
+               docker tag ${DOCKERHUB_USERNAME}/nginx-hello:latest ${DOCKERHUB_USERNAME}/nginx-hello:latest
+               docker push ${DOCKERHUB_USERNAME}/nginx-hello:latest
 
 workflows:
    capstone:
