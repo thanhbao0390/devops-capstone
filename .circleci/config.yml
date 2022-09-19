@@ -35,7 +35,6 @@ jobs:
                cd nginx-hello
                docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}
                docker build -t ${DOCKERHUB_USERNAME}/nginx-hello:latest .
-               docker push ${DOCKERHUB_USERNAME}/nginx-hello:latest
                docker tag ${DOCKERHUB_USERNAME}/nginx-hello:latest ${DOCKERHUB_USERNAME}/nginx-hello:latest
                docker push ${DOCKERHUB_USERNAME}/nginx-hello:latest
 
