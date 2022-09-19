@@ -40,6 +40,6 @@ workflows:
       jobs:
          - install
          - build:
-            keys: [install]
+            requires: [install]
       
       
