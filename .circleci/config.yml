@@ -19,8 +19,8 @@ jobs:
                cd nginx-hello
                make install
                # Install hadolint
-               wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
-               chmod a+rx /bin/hadolint
+               wget -O ./hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+               chmod a+rx ./hadolint
                make lint
 
    build:
@@ -41,8 +41,6 @@ jobs:
 workflows:
    capstone:
       jobs:
-         - install
-         - build:
-            requires: [install]
+         - build
       
       
