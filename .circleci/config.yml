@@ -21,19 +21,12 @@ jobs:
                # Install hadolint
                wget -O ./hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
                chmod +x ./hadolint
-         - run:
-            name: run lint
-            command: |
-               cd nginx-hello
-               make lint 
-         - save_cache:
-            paths: [./venv]
-            key: venv
+               make lint
 
    build:
       docker:
          - image: circleci/python:3.7.3-stretch
-      working_directory: ~/app
+      working_directory: ~/repo
       steps:
          - checkout
          - run:
