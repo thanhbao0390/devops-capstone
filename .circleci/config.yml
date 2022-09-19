@@ -7,35 +7,25 @@ orbs:
 jobs:
    build:
       docker:
-         - image: python:3.7.3-stretch
+      - image: cimg/base:2021.04
+         auth:
+            username: thanhbao0390
+            password: $DOCKERHUB_PASSWORD
       steps:
          - checkout
          - run:
-            name: Setup eviroment
-            command: |
-               python3 -m venv venv
-               . venv/bin/activate
-               # Install hadolint
-               wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
-               chmod +x /bin/hadolint
-         - run:
-            name: Install dependence
+            name: Build docker
             command: |
                cd nginx-hello
-               make install
+               make build
          - run:
-            name: Building image
+            name: Push docker
             command: |
                cd nginx-hello
-               docker build -t thanhbao0390/nginx-hello:1.0 .
-         - save_cache:
-            paths: [capstone]
-            key: nginx-hello-build
-   
-   
+               make build
 
 workflows:
-  capstone:
-    jobs:
-      - build
+   capstone:
+      jobs:
+         - build
       
