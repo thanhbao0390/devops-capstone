@@ -39,3 +39,5 @@ workflows:
    capstone:
       jobs:
          - build
+         - test:
+            requires: [build]
