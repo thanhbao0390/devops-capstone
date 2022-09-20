@@ -1,15 +1,15 @@
-setup:
-	python3 -m venv venv
-	source ./venv/bin/activate 
+VERSION=0.1
+PREFIX=nginxdemos/nginx-hello
+TAG=$(VERSION)
 
-install:
-# This should be run from inside a virtualenv
-	pip install --upgrade pip &&\
-	pip install -r requirements.txt &&\
-	wget -O ./hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
-	chmod +x ./hadolint
-lint:
-	hadolint Dockerfile
-	pylint --disable=R,C,W1203,W1202 app.py
+all: build push
 
-all: setup install lint
+build:
+	@echo "Building image:"
+	docker build -t $(PREFIX):$(TAG) .
+push:
+	@echo "Pushing image:"
+	docker push $(PREFIX):$(TAG)
+test:
+	@echo "Running container:"
+	docker run --rm -p 8080:8080 $(PREFIX):$(TAG)
