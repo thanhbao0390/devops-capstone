@@ -25,15 +25,17 @@ jobs:
 
    build:
       docker:
-         - image: circleci/python:3.7.3-stretch
+         - image: cimg/go:1.17
       working_directory: ~/repo
       steps:
          - checkout
+         - setup_remote_docker:
+            version: 20.10.14
+            docker_layer_caching: true
          - run:
             name: build and push docker hub
             command: |
                cd nginx-hello
-               systemctl start docker
                docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}
                docker build -t nginx-hello:latest .
                docker tag nginx-hello:latest ${DOCKERHUB_USERNAME}/nginx-hello:latest
