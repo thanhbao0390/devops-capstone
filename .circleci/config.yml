@@ -5,25 +5,35 @@ orbs:
    slack: circleci/slack@4.10.1
 
 jobs:
-   install:
+   build:
       docker:
-         - image: circleci/python:3.7.3-stretch
-      working_directory: ~/repo
+         - image: python:3.7.3-stretch
+      working_directory: ~/repo/nginx-hello
       steps:
          - checkout
+         - restore_cache:
+            keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            - v1-dependencies-
          - run:
-            name: Install dependencies and Lint
+            name: install dependencies
             command: |
                python3 -m venv venv
                . venv/bin/activate
-               cd nginx-hello
                make install
                # Install hadolint
-               wget -O ./hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
-               chmod a+rx ./hadolint
-               make lint
-
-   build:
+               wget -O /bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.3/hadolint-Linux-x86_64 &&\
+               chmod +x /bin/hadolint
+         - save_cache:
+            paths:
+               - ./venv
+            key: v1-dependencies-{{ checksum "requirements.txt" }}
+         - run:
+            name: run lint
+            command: |
+               . venv/bin/activate
+               make lint 
+   push-docker:
       docker:
          - image: cimg/go:1.17
       working_directory: ~/repo
@@ -45,5 +55,7 @@ workflows:
    capstone:
       jobs:
          - build
+         - push-docker:
+            requires: [build]
       
       
