@@ -33,9 +33,10 @@ jobs:
             name: build and push docker hub
             command: |
                cd nginx-hello
+               systemctl start docker
                docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}
                docker build -t nginx-hello:latest .
-               docker tag ${DOCKERHUB_USERNAME}/nginx-hello:latest ${DOCKERHUB_USERNAME}/nginx-hello:latest
+               docker tag nginx-hello:latest ${DOCKERHUB_USERNAME}/nginx-hello:latest
                docker push ${DOCKERHUB_USERNAME}/nginx-hello:latest
 
 workflows:
