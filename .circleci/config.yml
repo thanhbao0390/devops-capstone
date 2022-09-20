@@ -33,10 +33,11 @@ jobs:
             version: 20.10.14
             docker_layer_caching: true
          - run:
-            name: build and push docker hub
+            name: run test
             command: |
                cd nginx-hello
-               make test
+               make test &
+
 
 workflows:
    capstone:
