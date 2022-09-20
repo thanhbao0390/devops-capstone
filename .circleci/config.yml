@@ -30,11 +30,17 @@ jobs:
       steps:
          - checkout
          - run:
-            name: Build and push to docker hub
+            name: login docker hub
             command: |
                cd nginx-hello
                docker login -u ${DOCKERHUB_USERNAME_LOGIN} -p ${DOCKERHUB_PASSWORD}
+         - run:
+            name: Build
+            command: |
                docker build -t ${DOCKERHUB_USERNAME}/nginx-hello:latest .
+         - run:
+            name: login docker hub
+            command: |
                docker tag ${DOCKERHUB_USERNAME}/nginx-hello:latest ${DOCKERHUB_USERNAME}/nginx-hello:latest
                docker push ${DOCKERHUB_USERNAME}/nginx-hello:latest
 
