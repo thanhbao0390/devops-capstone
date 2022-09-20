@@ -1,9 +1,10 @@
-VERSION=0.1
-PREFIX=nginxdemos/nginx-hello
+VERSION=latest
+PREFIX=thanhbao0390/nginx-hello
 TAG=$(VERSION)
 
 all: build push
 
+	
 build:
 	@echo "Building image:"
 	docker build -t $(PREFIX):$(TAG) .
