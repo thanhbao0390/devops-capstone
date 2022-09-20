@@ -23,6 +23,17 @@ jobs:
                # docker build -t nginx-hello:latest .
                # docker tag nginx-hello:latest ${DOCKERHUB_USERNAME}/nginx-hello:latest
                # docker push ${DOCKERHUB_USERNAME}/nginx-hello:latest
+   test:
+      docker:
+         - image: cimg/go:1.17
+      working_directory: ~/repo
+      steps:
+         - checkout
+         - run:
+            name: build and push docker hub
+            command: |
+               cd nginx-hello
+               make test
 
 workflows:
    capstone:
