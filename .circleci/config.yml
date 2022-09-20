@@ -33,7 +33,7 @@ jobs:
             name: login docker hub
             command: |
                cd nginx-hello
-               docker login -u ${DOCKERHUB_USERNAME_LOGIN} -p ${DOCKERHUB_PASSWORD}
+               docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}
          - run:
             name: Build
             command: |
