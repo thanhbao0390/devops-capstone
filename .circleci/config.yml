@@ -37,6 +37,8 @@ jobs:
             command: |
                cd nginx-hello
                make test &
+               sleep 60s
+               curl localhost:8080
 
 
 workflows:
