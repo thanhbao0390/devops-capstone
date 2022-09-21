@@ -9,7 +9,7 @@ commands:
       description: Destroy front-end cloudformation stacks
       parameters:
          workflow_id:
-         type: string
+            type: string
       steps:
          - run:
             name: Destroy frontend
