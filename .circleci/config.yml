@@ -38,7 +38,22 @@ jobs:
                cd nginx-hello
                make test &
                sleep 120s
-
+   deploy-infrastructure:
+      docker:
+         - image: cimg/go:1.17
+      working_directory: ~/repo
+      steps:
+         - checkout
+         - run:
+            name: Ensure front-end infrastructure exist
+            command: |
+               aws cloudformation deploy \
+               --template-file .circleci/files/frontend.yml \
+               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
+               --tags project=udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+         - destroy-environment:
+            workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
 workflows:
    capstone:
@@ -46,3 +61,8 @@ workflows:
          - build
          - test:
             requires: [build]
+         - deploy-infrastructure:
+            requires: [test]
+            filters:
+               branches:
+               only: [main]
