@@ -73,7 +73,7 @@ jobs:
 
    deploy-frontend:
       docker:
-         image: cimg/go:1.17
+         - image: cimg/go:1.17
       working_directory: ~/repo
       steps:
          - checkout
