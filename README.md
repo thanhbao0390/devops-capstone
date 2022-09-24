@@ -45,6 +45,6 @@ docker push thanhbao0390/nginx-hello
 ```
 
 ## Result 
-LoadBalancer URL:
+URL: http://dsybc7wmit1bv.cloudfront.net/
 
 
