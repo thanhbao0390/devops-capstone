@@ -73,7 +73,6 @@ jobs:
          - run:
             name: Ensure front-end infrastructure exist
             command: |
-               cd iaac
                aws cloudformation deploy \
                --template-file .circleci/files/frontend.yml \
                --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
