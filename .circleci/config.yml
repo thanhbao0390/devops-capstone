@@ -147,10 +147,6 @@ jobs:
       steps:
          - checkout
          - run:
-            name: Install dependencies
-            command: |
-               apk add curl
-         - run:
             name: Get old stack workflow id
             command: |
                # Fetch the Old workflow ID
