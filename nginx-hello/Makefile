@@ -4,4 +4,4 @@ install:
 	pip install html_linter
 lint:
 	./hadolint Dockerfile
-	html_lint.py index.html
+	html_lint.py --disable=R,C,W1203,W1202 index.html
