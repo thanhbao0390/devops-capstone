@@ -29,6 +29,12 @@ jobs:
             command: |
                cd nginx-hello
                make install
+
+   test:
+      docker:
+         - image: python:3.7.3-stretch
+      steps:
+         - checkout
          - run:
             name: Lint html
             command: |
@@ -163,8 +169,10 @@ workflows:
    capstone:
       jobs:
          - build
-         - docker-build:
+         - test:
             requires: [build]
+         - docker-build:
+            requires: [test]
          - deploy-infrastructure:
             requires: [docker-build]
             filters:
