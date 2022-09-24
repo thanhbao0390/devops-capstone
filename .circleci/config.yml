@@ -166,7 +166,7 @@ workflows:
          - docker-build:
             requires: [build]
          - deploy-infrastructure:
-            requires: [test]
+            requires: [docker-build]
             filters:
                branches:
                   only: [main]
