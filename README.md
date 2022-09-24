@@ -11,12 +11,11 @@ The final CAPSTONE project
 * [Result](#result)
 
 ## General info
-CI/CD pipeline for deploying and linting a microservices application NGINX using Rolling Deployment. Pipeline will containerize application and push the docker image to the Docker Hub.  After that it will create the AWS network infrastructure required to deploy the applicion, AWS EKS Cluster & Nodes and it will deploy application to the EKS Cluster.
+CI/CD pipeline for deploying and linting a microservices application NGINX using Rolling Deployment. Pipeline will containerize application and push the docker image to the Docker Hub.  After that it will create the AWS network infrastructure required to deploy the application.
 
 ## Folder structure
 * nginx-hello : Source Files
-* iaac : Infrastructure as a code - Deployment Files
-* .circleci : Configuration File for CircleCI & Kubernetes deployment and service files
+* .circleci : Configuration File for CircleCI
 	
 ## Tools
 Project is created with:
@@ -36,17 +35,14 @@ To run this project in CircleCI, you have to:
 * Setup DockerHub account. Save username and password to your local computer, you will need it.
 * AWS : configure default VPC  and Key Pair. Store Access key id and secret access key to your local computer, you will need it.
 * Configure enviroment variables AWS_DEAFULT_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, DOCKERHUB_PASSWORD, DOCKERHUB_USERNAME in your CircleCI account
-* Change SSHKeyName Value with your AWS Key Pair name (ec2-params.json)
-* Use imageid compliant with your AWS Region (ec2-params.json)
 * Change the build job from config.yml in order to include your DockerHub credentials, for example :
 
 ```
-ddocker build -t thanhbao0390/devops-capstone .
+docker build -t thanhbao0390/nginx-hello .
 docker tag nginx-hello:latest ${DOCKERHUB_USERNAME}/nginx-hello:latest
-docker push thanhbao0390/devops-capstone
+docker push thanhbao0390/nginx-hello
 
 ```
-
 
 ## Result 
 LoadBalancer URL:

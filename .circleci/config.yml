@@ -100,6 +100,10 @@ jobs:
       steps:
          - checkout
          - run:
+            name: Install dependencies
+            command: |
+               apk add curl
+         - run:
             name: Frontend smoke test.
             command: |
                # your code here
@@ -118,6 +122,10 @@ jobs:
          - image: amazon/aws-cli
       steps:
          - checkout
+         - run:
+            name: Install dependencies
+            command: |
+               apk add curl
          - run:
             name: Save Old Workflow ID to kvdb.io
             command: |
@@ -142,6 +150,10 @@ jobs:
          - image: amazon/aws-cli
       steps:
          - checkout
+         - run:
+            name: Install dependencies
+            command: |
+               apk add curl
          - run:
             name: Get old stack workflow id
             command: |
