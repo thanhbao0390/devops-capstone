@@ -21,6 +21,22 @@ commands:
 jobs:
    build:
       docker:
+         - image: python:3.7.3-stretch
+      steps:
+         - checkout
+         - run:
+            name: Make install
+            command: |
+               cd nginx-hello
+               make install
+         - run:
+            name: Lint html
+            command: |
+               cd nginx-hello
+               make lint
+
+   docker-build:
+      docker:
          - image: cimg/go:1.17
       working_directory: ~/repo
       steps:
@@ -32,27 +48,10 @@ jobs:
             name: build and tag docker hub
             command: |
                cd nginx-hello
-               make build
-               # docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}
-               # docker build -t nginx-hello:latest .
-               # docker tag nginx-hello:latest ${DOCKERHUB_USERNAME}/nginx-hello:latest
-               # docker push ${DOCKERHUB_USERNAME}/nginx-hello:latest
-
-   test:
-      docker:
-         - image: cimg/go:1.17
-      working_directory: ~/repo
-      steps:
-         - checkout
-         - setup_remote_docker:
-            version: 20.10.14
-            docker_layer_caching: true
-         - run:
-            name: run test
-            command: |
-               cd nginx-hello
-               make test &
-               sleep 120s
+               docker login -u ${DOCKERHUB_USERNAME} -p ${DOCKERHUB_PASSWORD}
+               docker build -t nginx-hello:latest .
+               docker tag nginx-hello:latest ${DOCKERHUB_USERNAME}/nginx-hello:latest
+               docker push ${DOCKERHUB_USERNAME}/nginx-hello:latest
 
    deploy-infrastructure:
       docker:
@@ -63,11 +62,12 @@ jobs:
          - run:
             name: Ensure front-end infrastructure exist
             command: |
+               cd iaac
                aws cloudformation deploy \
                --template-file .circleci/files/frontend.yml \
                --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
                --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
-               --tags project=udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} 
+               --tags project=udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} \
          - destroy-environment:
             workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
@@ -84,12 +84,86 @@ jobs:
          - destroy-environment:
             workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
+   smoke-test:
+      docker:
+         - image: python:3.7-alpine3.11
+      steps:
+         - checkout
+         - run:
+            name: Frontend smoke test.
+            command: |
+               # your code here
+               URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com/"            
+               if curl -s ${URL} | grep "Hello World"
+               then
+                  return 0
+               else
+                  return 1
+               fi
+         - destroy-environment:
+            workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+
+   cloudfront-update:
+      docker:
+         - image: amazon/aws-cli
+      steps:
+         - checkout
+         - run:
+            name: Save Old Workflow ID to kvdb.io
+            command: |
+               export OLD_WORKFLOW_ID=$(aws cloudformation \
+                     list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+                     --no-paginate --output text)
+               echo "Old Wokflow ID: $OLD_WORKFLOW_ID"
+               curl https://kvdb.io/9B6earijytWR5tL1bU197z/old_workflow_id -d "${OLD_WORKFLOW_ID}"
+         - run:
+            name: Update cloudfront distribution
+            command: |
+               echo ${CIRCLE_WORKFLOW_ID:0:7}
+               aws cloudformation deploy \
+               --template-file .circleci/files/cloudfront.yml \
+               --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+               --stack-name udapeople-cloudfont 
+         - destroy-environment:
+            workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+
+   cleanup:
+      docker:
+         - image: amazon/aws-cli
+      steps:
+         - checkout
+         - run:
+            name: Get old stack workflow id
+            command: |
+               # Fetch the Old workflow ID
+               export OldWorkflowID=$(curl --insecure https://kvdb.io/9B6earijytWR5tL1bU197z/old_workflow_id)
+               echo  OldWorkflowID:  "${OldWorkflowID}"
+               echo CIRCLE_WORKFLOW_ID: "${CIRCLE_WORKFLOW_ID:0:7}"
+               # Fetch the stack names
+               export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+                     --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
+               echo Stack names= "${STACKS[@]}"
+
+               if [ -z "$var" ]
+               then
+                  echo "nothing to clean up........."
+               else
+                  if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
+                  then
+                     echo "cleaning up ............."
+                     echo bucket= "s3://udapeople-${OldWorkflowID}"
+                     aws s3 rb "s3://udapeople-${OldWorkflowID}" --force
+                     aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+                  else
+                     echo "nothing to clean up........."
+                  fi
+               fi
 
 workflows:
    capstone:
       jobs:
          - build
-         - test:
+         - docker-build:
             requires: [build]
          - deploy-infrastructure:
             requires: [test]
@@ -98,3 +172,9 @@ workflows:
                   only: [main]
          - deploy-frontend:
             requires: [deploy-infrastructure]
+         - smoke-test:
+            requires: [deploy-frontend]
+         - cloudfront-update:
+            requires: [smoke-test]
+         - cleanup:
+            requires: [cloudfront-update]
