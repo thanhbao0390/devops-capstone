@@ -123,10 +123,6 @@ jobs:
       steps:
          - checkout
          - run:
-            name: Install dependencies
-            command: |
-               apk add curl
-         - run:
             name: Save Old Workflow ID to kvdb.io
             command: |
                export OLD_WORKFLOW_ID=$(aws cloudformation \
