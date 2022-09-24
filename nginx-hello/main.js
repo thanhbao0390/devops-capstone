@@ -15,3 +15,5 @@ function changeCookie() {
         clearTimeout(ref);
     }
 }
+
+document.onload = function() {checkRefresh()};
